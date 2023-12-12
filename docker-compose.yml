@@ -14,13 +14,18 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-  app:
+  producer:
+    image: 'python:latest'
+    ports:
+      - '5000:5000'
+    volumes:
+      - './Producer:/app'
+    working_dir: '/app'
+    command: bash -c "pip install -r requirements.txt && python app.py"
+  consumer:
     image: 'maven:latest'
     working_dir: '/app'
     ports:
       - '8080:8080'
     volumes:
-      - '.:/app'
-    environment:
-      - TERM=xterm
-    command: bash -c "mvn clean install && clear && mvn spring-boot:run"
+      - './Consumer:/app'
