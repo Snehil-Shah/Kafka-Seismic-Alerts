@@ -7,21 +7,29 @@ services:
     ports:
       - '2181:2181'
   kafka:
-    image: 'confluentinc/cp-kafka:latest'
+    build:
+      context: ./Kafka
+      dockerfile: Dockerfile
     ports:
       - '9092:9092'
     environment:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper
   producer:
-    image: 'python:latest'
+    build:
+      context: ./Producer
+      dockerfile: Dockerfile
     ports:
       - '5000:5000'
     volumes:
       - './Producer:/app'
     working_dir: '/app'
-    command: bash -c "pip install -r requirements.txt && python app.py"
+    depends_on:
+      - zookeeper
+      - kafka
   consumer:
     image: 'maven:latest'
     working_dir: '/app'
@@ -29,3 +37,6 @@ services:
       - '8080:8080'
     volumes:
       - './Consumer:/app'
+    depends_on:
+      - zookeeper
+      - kafka
