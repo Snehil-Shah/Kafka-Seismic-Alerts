@@ -1,4 +1,4 @@
-package kafka.consumer.clients;
+package kafka.consumers.clients;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -11,7 +11,11 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import kafka.consumer.ConsumerConfig;
+import kafka.consumers.ConsumerConfig;
+
+/**
+ * Logger Consumer Class
+ */
 
 public class Logger {
     private ConsumerConfig loggerConfig = new ConsumerConfig("Logger");
@@ -20,8 +24,6 @@ public class Logger {
     public Logger() {
         logger.subscribe((Arrays.asList("severe_seismic_events", "minor_seismic_events")));
     }
-
-    // TODO: Test if both topics are consumed
 
     public void consume() {
         while (true) {

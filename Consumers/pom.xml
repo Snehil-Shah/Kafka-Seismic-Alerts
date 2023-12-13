@@ -5,12 +5,12 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>kafka.consumer</groupId>
-  <artifactId>consumer</artifactId>
+  <groupId>kafka.consumers</groupId>
+  <artifactId>consumers</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>consumer</name>
-  <url>kafka.consumer.org</url>
+  <name>consumers</name>
+  <url>kafka.consumers.org</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -95,7 +95,7 @@
           <artifactId>exec-maven-plugin</artifactId>
           <version>1.6.0</version>
           <configuration>
-            <mainClass>kafka.consumer.Main</mainClass>
+            <mainClass>kafka.consumers.Main</mainClass>
           </configuration>
         </plugin>
       </plugins>

@@ -52,4 +52,4 @@ def process():
 
 
 if __name__ == "__main__":
-    API.run(host='producer', port=5000)
+    API.run(host='producers', port=5000)

@@ -1,7 +1,7 @@
 version: '3'
 services:
   zookeeper:
-    image: 'confluentinc/cp-zookeeper:latest'
+    image: 'confluentinc/cp-zookeeper:7.4.3'
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
     ports:
@@ -18,25 +18,27 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     depends_on:
       - zookeeper
-  producer:
+  producers:
     build:
-      context: ./Producer
+      context: ./Producers
       dockerfile: Dockerfile
     ports:
       - '5000:5000'
     volumes:
-      - './Producer:/app'
-    working_dir: '/app'
+      - './Producers:/service'
+    working_dir: '/service'
     depends_on:
       - zookeeper
       - kafka
-  consumer:
-    image: 'maven:latest'
-    working_dir: '/app'
-    ports:
-      - '8080:8080'
+  consumers:
+    build:
+      context: ./Consumers
+      dockerfile: Dockerfile
+    working_dir: '/service'
+    environment:
+      KAFKA_SERVER: kafka:9092
     volumes:
-      - './Consumer:/app'
+      - './Consumers:/service'
     depends_on:
       - zookeeper
       - kafka
