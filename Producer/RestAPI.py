@@ -3,6 +3,7 @@ This module builds a flask API endpoint where you can Report Seismic Activity,
 or fetch the entire preserved log history from the database
 """
 
+from __future__ import unicode_literals
 import json
 from os import name
 from flask import Flask, jsonify, request
@@ -16,12 +17,12 @@ API_producer = Producer(
 
 API = Flask(__name__)
 
-def parseData(event):
+def parseData(data):
     try:
-        magnitude = int(event['magnitude'])
-        region = event['region']
-        time = event['time']
-        co_ordinates = list(event['co_ordinates'])
+        magnitude = int(data['magnitude'])
+        region = data['region']
+        time = data['time']
+        co_ordinates = list(data['co_ordinates'])
         return {'magnitude': magnitude, 'region': region, 'time': time, 'co_ordinates': co_ordinates}
     except:
         return False
@@ -30,8 +31,7 @@ def activity_logs():
     return jsonify({"message": "GET request received, returning activity logs"})
 
 
-def publish_event(data):
-    event = parseData(data)
+def publish_event(event):
     if event:
         if event['magnitude']>=3.5:
             API_producer.produce('severe_seismic_events', json.dumps(event).encode('utf-8'))
@@ -41,13 +41,13 @@ def publish_event(data):
     else:
         return jsonify({"message":"Incorrect Data Format! Try Again!"})
 
-
+# The Endpoint
 @API.route("/activity", methods=["GET", "POST"])
 def process():
     if request.method == "GET":
         return activity_logs()
     elif request.method == "POST":
-        return publish_event(request.get_json())
+        return publish_event(parseData(request.get_json()))
     return jsonify({"message": "405: Invalid HTTP Access"})
 
 
