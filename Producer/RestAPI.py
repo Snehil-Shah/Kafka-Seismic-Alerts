@@ -19,7 +19,7 @@ API = Flask(__name__)
 
 def parseData(data):
     try:
-        magnitude = int(data['magnitude'])
+        magnitude = float(data['magnitude'])
         region = data['region']
         time = data['time']
         co_ordinates = list(data['co_ordinates'])

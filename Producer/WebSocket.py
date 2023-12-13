@@ -23,7 +23,7 @@ WS_producer = Producer(
 
 def parseData(data):
     try:
-        magnitude = int(data['data']['properties']['mag'])
+        magnitude = float(data['data']['properties']['mag'])
         region = data['data']['properties']['flynn_region']
         time = data['data']['properties']['time']
         co_ordinates = list(data['data']['geometry']['coordinates'])
@@ -33,7 +33,7 @@ def parseData(data):
 
 def publish_event(event):
     if event:
-        logging.info(f" {event['time']} - Mag:{event['magnitude']} > {event['region']}")
+        logging.info(event)
         if event['magnitude']>=3.5:
             WS_producer.produce('severe_seismic_events', json.dumps(event).encode('utf-8'))
         else:
