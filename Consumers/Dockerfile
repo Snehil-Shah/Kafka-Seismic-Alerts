@@ -1,5 +1,8 @@
 FROM maven:latest
-ADD . /service
-WORKDIR /service
+
+LABEL org.opencontainers.image.description="Build & Execute a Maven Project using exec-maven-plugin"
+
+ADD . /consumers
+WORKDIR /consumers
 RUN mvn clean install
-CMD [ "mvn","-q","exec:java" ]
+CMD [ "mvn","-q","-e","exec:java" ]

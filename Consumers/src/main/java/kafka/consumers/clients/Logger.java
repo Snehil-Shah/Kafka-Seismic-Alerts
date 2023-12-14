@@ -31,10 +31,10 @@ public class Logger {
             ConsumerRecords<String, String> records = logger.poll(Duration.ofSeconds(1));
             for (ConsumerRecord<String, String> record : records) {
                 try {
-                    Map<String, Object> recordVal = mapper.readValue(record.value(),
-                            new TypeReference<Map<String, Object>>() {
+                    Map<String, Map<String,Object>> recordVal = mapper.readValue(record.value(),
+                            new TypeReference<Map<String, Map<String,Object>>>() {
                             });
-                    System.out.printf(" %s - Mag:%f > %s\n",recordVal.get("time"),recordVal.get("magnitude"), recordVal.get("region"));
+                    System.out.printf(" %s - Mag:%.1f > %s\n",recordVal.get("payload").get("time"),recordVal.get("payload").get("magnitude"), recordVal.get("payload").get("region"));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -1,5 +1,7 @@
 package kafka.consumers;
+
 import kafka.consumers.clients.Logger;
+import kafka.consumers.clients.Database;
 
 /**
  * Entrypoint to the Service that initializes and starts both Consumer clients
@@ -7,8 +9,11 @@ import kafka.consumers.clients.Logger;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("hello world");
+        System.out.println("Waiting for Kafka & Database..");
+        Database logRegistry = new Database();
+        logRegistry.kafka_connect();
         Logger logClient = new Logger();
+        System.out.println("Log is Live..");
         logClient.consume();
     }
 }
