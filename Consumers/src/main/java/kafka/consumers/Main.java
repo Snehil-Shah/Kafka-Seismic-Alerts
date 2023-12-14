@@ -9,11 +9,10 @@ import kafka.consumers.clients.Database;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Waiting for Kafka & Database..");
+        System.out.println("Waiting for Kafka Broker & Database Sink Connector..");
         Database logRegistry = new Database();
         logRegistry.kafka_connect();
         Logger logClient = new Logger();
-        System.out.println("Log is Live..");
         logClient.consume();
     }
 }

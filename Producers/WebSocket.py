@@ -26,7 +26,7 @@ def parseData(data):
         magnitude = float(data["data"]["properties"]["mag"])
         region = data["data"]["properties"]["flynn_region"]
         time = data["data"]["properties"]["time"]
-        co_ordinates = list(data["data"]["geometry"]["coordinates"])
+        co_ordinates = "[" + ', '.join(map(str,list(data["data"]["geometry"]["coordinates"]))) + "]"
         return {
             "schema": {
                 "type": "struct",
@@ -36,7 +36,7 @@ def parseData(data):
                     {"field": "magnitude", "type": "float"},
                     {"field": "region", "type": "string"},
                     {"field": "time", "type": "string"},
-                    {"field": "co_ordinates", "type": "string"},
+                    {"field": "co_ordinates", "type": "string"}
                 ],
             },
             "payload": {
@@ -49,11 +49,9 @@ def parseData(data):
     except:
         return False
 
-
 def publish_event(event):
     if event:
-        logging.info(event)
-        if event["magnitude"] >= 3.5:
+        if event['payload']['magnitude']>=3.5:
             WS_producer.produce(
                 "severe_seismic_events", json.dumps(event).encode("utf-8")
             )
@@ -61,9 +59,9 @@ def publish_event(event):
             WS_producer.produce(
                 "minor_seismic_events", json.dumps(event).encode("utf-8")
             )
+        logging.info(f"WebSocket - - [{event['payload']['time']}] MESSAGE Received OK!")
     else:
-        logging.warning("Corrupt Data")
-
+        logging.warning("WebSocket - - Corrupt Data Received!")
 
 @gen.coroutine
 def listen(ws):
@@ -82,14 +80,14 @@ def launch_client():
         logging.info("Open WebSocket connection to seismicportal.eu")
         ws = yield websocket_connect(webSocket_uri, ping_interval=15)
     except Exception:
-        logging.exception("Connection Error")
+        logging.exception("WebSocket Connection Error")
     else:
-        logging.info("Waiting for messages...")
+        logging.info("WebSocket Connection Successful!\nWaiting for messages...")
         listen(ws)
 
 
 if __name__ == "__main__":
-    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO, format="%(message)s")
     io_loop = IOLoop.instance()
     launch_client()
     try:
