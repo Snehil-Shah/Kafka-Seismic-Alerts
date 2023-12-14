@@ -61,6 +61,7 @@ services:
     working_dir: "/service"
     depends_on:
       - kafka
+      - db
   consumers:
     build:
       context: ./Consumers

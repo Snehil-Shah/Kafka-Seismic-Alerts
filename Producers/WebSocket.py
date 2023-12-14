@@ -17,7 +17,7 @@ import socket
 webSocket_uri = "wss://www.seismicportal.eu/standing_order/websocket"
 
 WS_producer = Producer(
-    {"bootstrap.servers": "kafka:9092", "client.id": socket.gethostname()}
+    {"bootstrap.servers": "kafka:9092", "client.id": socket.gethostname(), "log_level": 0}
 )
 
 

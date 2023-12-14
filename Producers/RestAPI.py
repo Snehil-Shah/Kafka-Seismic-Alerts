@@ -5,7 +5,7 @@ or fetch the entire preserved log history from the database
 
 from __future__ import unicode_literals
 import json
-from os import name
+import psycopg2
 from dateutil.parser.isoparser import isoparse
 from flask import Flask, jsonify, request, make_response
 from confluent_kafka import Producer
@@ -13,10 +13,31 @@ import socket
 
 API_producer = Producer(
     {"bootstrap.servers": "kafka:9092",
-    "client.id": socket.gethostname()}
+    "client.id": socket.gethostname(),
+    "log_level": 0}
 )
 
 API = Flask(__name__)
+
+# GET
+
+def fetch_from_DB(table_1,table_2=None):
+    try:
+        conn = psycopg2.connect(
+            host="db",
+            database="Logs",
+            user="postgres",
+            password="password")
+        cur = conn.cursor()
+        if table_2:
+            cur.execute(f"SELECT * FROM {table_1} UNION SELECT * FROM {table_2}")
+        else:
+            cur.execute(f"SELECT * FROM {table_1}")
+        return jsonify([{'magnitude':row[0], 'region': row[1], 'time': row[2], 'co_ordinates': row[3]} for row in cur.fetchall()])
+    except:
+        return make_response(jsonify({'message':"Service Unavailable at the Moment!"}),503)
+
+# POST
 
 def parseData(data):
     try:
@@ -46,18 +67,38 @@ def publish_event(event):
             API_producer.produce('severe_seismic_events', value = json.dumps(event).encode('utf-8'))
         else:
             API_producer.produce('minor_seismic_events', value = json.dumps(event).encode('utf-8'))
-        return jsonify({"message": "Event Published Successfully","event":event})
+        return jsonify({"message": "Event Published Successfully","event":event['payload']})
     else:
         return make_response(jsonify({"message":"Incorrect Data Format! Try Again!"}),422)
 
-# The Endpoint
-@API.route("/activity", methods=["GET", "POST"])
-def process():
+# The Endpoints
+
+@API.route("/events", methods=["GET", "POST"])
+def events():
     if request.method == "GET":
-        return activity_logs()
+        return fetch_from_DB("severe_seismic_events","minor_seismic_events")
     elif request.method == "POST":
         return publish_event(parseData(request.get_json()))
-    return make_response(jsonify({"message": "Invalid HTTP Access"}),405)
+    else:
+        return make_response(jsonify({"message": "Invalid HTTP Access. Use GET/POST method on this Endpoint"}),405)
+
+@API.route("/events/severe")
+def severe():
+    if request.method == "GET":
+        return fetch_from_DB("severe_seismic_events")
+    else:
+        return make_response(jsonify({"message": "Invalid HTTP Access. Use GET method on this Endpoint"}),405)
+
+@API.route("/events/minor")
+def minor():
+    if request.method == "GET":
+        return fetch_from_DB("minor_seismic_events")
+    else:
+        return make_response(jsonify({"message": "Invalid HTTP Access. Use GET method on this Endpoint"}),405)
+
+@API.errorhandler(404)
+def invalid_endpoint(e):
+    return make_response(jsonify({"message":"Not an Endpoint", "Available Endpoints":["GET, POST -> /events","GET -> /events/severe","GET -> /events/minor"]}),404)
 
 if __name__ == "__main__":
     API.run(host='producers', port=5000)

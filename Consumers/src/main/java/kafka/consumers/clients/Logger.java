@@ -24,7 +24,7 @@ public class Logger {
     public Logger() {
         logger.subscribe((Arrays.asList("severe_seismic_events", "minor_seismic_events")));
         System.out.println("Subscribed to Kafka Topic..");
-        System.out.println("\nLog is Live..");
+        System.out.println("Log is Live.. \n");
     }
 
     public void consume() {
