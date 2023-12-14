@@ -1,4 +1,7 @@
 FROM confluentinc/cp-kafka:7.4.3
+
+LABEL org.opencontainers.image.description="Run a Custom Kafka initialization script. dir: server.properties & kafka_init.sh"
+
 COPY server.properties /etc/kafka/server.properties
 COPY kafka_init.sh /kafka_init.sh
 EXPOSE 9092

@@ -14,32 +14,56 @@ from tornado import gen
 from confluent_kafka import Producer
 import socket
 
-webSocket_uri = 'wss://www.seismicportal.eu/standing_order/websocket'
+webSocket_uri = "wss://www.seismicportal.eu/standing_order/websocket"
 
 WS_producer = Producer(
-    {"bootstrap.servers": "kafka:9092",
-    "client.id": socket.gethostname()}
+    {"bootstrap.servers": "kafka:9092", "client.id": socket.gethostname()}
 )
+
 
 def parseData(data):
     try:
-        magnitude = float(data['data']['properties']['mag'])
-        region = data['data']['properties']['flynn_region']
-        time = data['data']['properties']['time']
-        co_ordinates = list(data['data']['geometry']['coordinates'])
-        return {'magnitude': magnitude, 'region': region, 'time': time, 'co_ordinates': co_ordinates}
+        magnitude = float(data["data"]["properties"]["mag"])
+        region = data["data"]["properties"]["flynn_region"]
+        time = data["data"]["properties"]["time"]
+        co_ordinates = list(data["data"]["geometry"]["coordinates"])
+        return {
+            "schema": {
+                "type": "struct",
+                "optional": False,
+                "version": 1,
+                "fields": [
+                    {"field": "magnitude", "type": "float"},
+                    {"field": "region", "type": "string"},
+                    {"field": "time", "type": "string"},
+                    {"field": "co_ordinates", "type": "string"},
+                ],
+            },
+            "payload": {
+                "magnitude": magnitude,
+                "region": region,
+                "time": time,
+                "co_ordinates": co_ordinates,
+            },
+        }
     except:
         return False
+
 
 def publish_event(event):
     if event:
         logging.info(event)
-        if event['magnitude']>=3.5:
-            WS_producer.produce('severe_seismic_events', json.dumps(event).encode('utf-8'))
+        if event["magnitude"] >= 3.5:
+            WS_producer.produce(
+                "severe_seismic_events", json.dumps(event).encode("utf-8")
+            )
         else:
-            WS_producer.produce('minor_seismic_events', json.dumps(event).encode('utf-8'))
+            WS_producer.produce(
+                "minor_seismic_events", json.dumps(event).encode("utf-8")
+            )
     else:
-        logging.warning('Corrupt Data')
+        logging.warning("Corrupt Data")
+
 
 @gen.coroutine
 def listen(ws):
@@ -50,6 +74,7 @@ def listen(ws):
             ws = None
             break
         publish_event(parseData(json.loads(msg)))
+
 
 @gen.coroutine
 def launch_client():
@@ -62,7 +87,8 @@ def launch_client():
         logging.info("Waiting for messages...")
         listen(ws)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     io_loop = IOLoop.instance()
     launch_client()

@@ -22,8 +22,15 @@ def parseData(data):
         magnitude = float(data['magnitude'])
         region = data['region']
         time = data['time']
-        co_ordinates = list(data['co_ordinates'])
-        return {'magnitude': magnitude, 'region': region, 'time': time, 'co_ordinates': co_ordinates}
+        co_ordinates = data['co_ordinates']
+        return {'schema':{
+            "type":'struct', 'optional': False, 'version':1, 'fields':[
+                {"field":"magnitude","type":"float"},
+                {"field":"region","type":"string"},
+                {"field":"time","type":"string"},
+                {"field":"co_ordinates","type":"string"}
+            ]
+        },'payload': {'magnitude': magnitude, 'region': region, 'time': time, 'co_ordinates': co_ordinates}}
     except:
         return False
 
@@ -33,10 +40,10 @@ def activity_logs():
 
 def publish_event(event):
     if event:
-        if event['magnitude']>=3.5:
-            API_producer.produce('severe_seismic_events', json.dumps(event).encode('utf-8'))
+        if event['payload']['magnitude']>=3.5:
+            API_producer.produce('severe_seismic_events', value = json.dumps(event).encode('utf-8'))
         else:
-            API_producer.produce('minor_seismic_events', json.dumps(event).encode('utf-8'))
+            API_producer.produce('minor_seismic_events', value = json.dumps(event).encode('utf-8'))
         return jsonify({"message": "Event Published Successfully","event":event})
     else:
         return jsonify({"message":"Incorrect Data Format! Try Again!"})
@@ -49,7 +56,6 @@ def process():
     elif request.method == "POST":
         return publish_event(parseData(request.get_json()))
     return jsonify({"message": "405: Invalid HTTP Access"})
-
 
 if __name__ == "__main__":
     API.run(host='producers', port=5000)
