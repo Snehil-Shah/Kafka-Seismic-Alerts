@@ -69,27 +69,33 @@ def publish_event(event):
             API_producer.produce('minor_seismic_events', value = json.dumps(event).encode('utf-8'))
         return jsonify({"message": "Event Published Successfully","event":event['payload']})
     else:
-        return make_response(jsonify({"message":"Incorrect Data Format! Try Again!"}),422)
+        return make_response(jsonify({"message":"Incorrect Data Format! Try Again!",
+                                      "format":{
+                                          "magnitude":"float",
+                                          "region":"string",
+                                          "time":"ISO-8601 string",
+                                          "co_ordinates":"array of floats"
+                                      }}),422)
 
 # The Endpoints
 
-@API.route("/events", methods=["GET", "POST"])
+@API.route("/events", methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'])
 def events():
     if request.method == "GET":
         return fetch_from_DB("severe_seismic_events","minor_seismic_events")
     elif request.method == "POST":
         return publish_event(parseData(request.get_json()))
     else:
-        return make_response(jsonify({"message": "Invalid HTTP Access. Use GET/POST method on this Endpoint"}),405)
+        return make_response(jsonify({"message": "Invalid HTTP Access. Use GET or POST method on this Endpoint"}),405)
 
-@API.route("/events/severe")
+@API.route("/events/severe",methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'])
 def severe():
     if request.method == "GET":
         return fetch_from_DB("severe_seismic_events")
     else:
         return make_response(jsonify({"message": "Invalid HTTP Access. Use GET method on this Endpoint"}),405)
 
-@API.route("/events/minor")
+@API.route("/events/minor",methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'])
 def minor():
     if request.method == "GET":
         return fetch_from_DB("minor_seismic_events")
