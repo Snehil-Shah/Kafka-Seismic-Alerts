@@ -32,7 +32,7 @@ public class Database {
                         request_stream.write(body, 0, body.length);
                     }
                     if ("Created".equals(connection.getResponseMessage())) {
-                        System.out.println("Database initialized and connected..");
+                        System.out.println("-> Database initialized..");
                         connection.disconnect();
                         break;
                     }

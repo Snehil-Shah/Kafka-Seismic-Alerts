@@ -46,10 +46,10 @@ public class Alert {
         name = scanner.nextLine();
         System.out.print("Enter your email: ");
         email = scanner.nextLine();
-        System.out.print("\n");
+        System.out.print("Registered for Email Alerts!\n\n");
     }
 
-    private void send_mail(String user_name, String recipient_mail, String region, String co_ordinates,
+    private void send_mail(String user_name, String recipient_mail,String time, String region, String co_ordinates,
             float magnitude) {
         try {
             Message message = new MimeMessage(session);
@@ -60,7 +60,7 @@ public class Alert {
             message.setSubject("ALERT: Unusual Seismic Activity in " + region + " Detected!");
             message.setContent("<center><h2>SEISMIC ALERTS</h2></center>"+"<p>Dear " + user_name + "</p>" +
                     "<p>We are reaching out to inform you about an unusual seismic activity detected in " + region +
-                    " of magnitude" + magnitude +
+                    " of magnitude " + magnitude + " on " + time +
                     ".<br>We want to ensure that you are aware of the situation and take necessary precautions to ensure your safety.</p>"
                     +
                     "<h2>Details:</h2>" +
@@ -68,6 +68,7 @@ public class Alert {
                     "<li><strong>Region:</strong> " + region + "</li>" +
                     "<li><strong>Magnitude:</strong> " + magnitude + "</li>" +
                     "<li><strong>Coordinates:</strong> " + co_ordinates + "</li>" +
+                    "<li><strong>Time:</strong> " + time + "</li>" +
                     "</ul>" +
                     "<h2>Safety Precautions:</h2>" +
                     "<ol>" +
@@ -107,7 +108,7 @@ public class Alert {
                     Map<String, Map<String, Object>> recordVal = mapper.readValue(record.value(),
                             new TypeReference<Map<String, Map<String, Object>>>() {
                             });
-                    send_mail(name, email, recordVal.get("payload").get("region").toString(),
+                    send_mail(name, email,recordVal.get("payload").get("time").toString().replaceAll("T", " at ").replaceAll("Z","-UTC"), recordVal.get("payload").get("region").toString(),
                             recordVal.get("payload").get("co_ordinates").toString(),
                             Float.parseFloat(recordVal.get("payload").get("magnitude").toString()));
                 } catch (Exception e) {
