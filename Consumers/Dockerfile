@@ -5,4 +5,4 @@ LABEL org.opencontainers.image.description="Build & Execute a Maven Project usin
 ADD . /consumers
 WORKDIR /consumers
 RUN mvn clean install
-CMD [ "mvn","-q","-e","exec:java" ]
+CMD [ "bash" ]

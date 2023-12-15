@@ -67,7 +67,11 @@ services:
       context: ./Consumers
       dockerfile: Dockerfile
     working_dir: "/consumers"
+    env_file:
+      - Consumers/.env
     environment:
       KAFKA_SERVER: kafka:9092
     depends_on:
       - kafka
+    stdin_open: true
+    tty: true

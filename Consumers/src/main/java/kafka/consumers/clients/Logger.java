@@ -24,10 +24,10 @@ public class Logger {
     public Logger() {
         logger.subscribe((Arrays.asList("severe_seismic_events", "minor_seismic_events")));
         System.out.println("Subscribed to Kafka Topic..");
-        System.out.println("Log is Live.. \n");
     }
 
     public void consume() {
+        System.out.println("Log is Live.. \n");
         while (true) {
             ObjectMapper mapper = new ObjectMapper();
             ConsumerRecords<String, String> records = logger.poll(Duration.ofSeconds(1));
