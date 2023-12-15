@@ -6,7 +6,7 @@ or fetch the entire preserved log history from the database
 from __future__ import unicode_literals
 import json
 import psycopg2
-from dateutil.parser.isoparser import isoparse
+import re
 from flask import Flask, jsonify, request, make_response
 from confluent_kafka import Producer
 import socket
@@ -44,7 +44,9 @@ def parseData(data):
         magnitude = float(data['magnitude'])
         region = data['region']
         time = data["time"]
-        isoparse(time)
+        timeExpr = r"\d{4}(-\d{2}(-\d{2}(T\d{2}(:\d{2}(:\d{2}(\.\d{6})?)?)?(Z|[+-]\d{2}:\d{2})?)?)?)?"
+        if (not re.fullmatch(timeExpr,time)):
+            raise Exception("Invalid Time Format")
         co_ordinates = "[" + ', '.join(map(str,list(data['co_ordinates']))) + "]"
         return {'schema':{
             "type":'struct', 'optional': False, 'version':1, 'fields':[
@@ -73,7 +75,7 @@ def publish_event(event):
                                       "format":{
                                           "magnitude":"float",
                                           "region":"string",
-                                          "time":"ISO-8601 string",
+                                          "time":"ISO-8601 string. Min: YYYY, Max: YYYY-MM-DD(T)hh:mm:ss.ssssss(Zone)",
                                           "co_ordinates":"array of floats"
                                       }}),422)
 
