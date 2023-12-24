@@ -44,7 +44,7 @@ def parseData(data):
         magnitude = float(data['magnitude'])
         region = data['region']
         time = data["time"]
-        timeExpr = r"\d{4}(-\d{2}(-\d{2}(T\d{2}(:\d{2}(:\d{2}(\.\d{6})?)?)?(Z|[+-]\d{2}:\d{2})?)?)?)?"
+        timeExpr = r"\d{4}(-\d{2}(-\d{2}(T\d{2}(:\d{2}(:\d{2}(\.\d{1,6})?)?)?(Z|[+-]\d{2}:\d{2})?)?)?)?"
         if (not re.fullmatch(timeExpr,time)):
             raise Exception("Invalid Time Format")
         co_ordinates = "[" + ', '.join(map(str,list(data['co_ordinates']))) + "]"
