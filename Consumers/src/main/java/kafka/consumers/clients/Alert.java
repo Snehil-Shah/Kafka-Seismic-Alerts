@@ -47,6 +47,7 @@ public class Alert {
         System.out.print("Enter your email: ");
         email = scanner.nextLine();
         System.out.print("Registered for Email Alerts!\n\n");
+        scanner.close();
     }
 
     private void send_mail(String user_name, String recipient_mail,String time, String region, String co_ordinates,
@@ -58,7 +59,7 @@ public class Alert {
                     Message.RecipientType.TO,
                     InternetAddress.parse(recipient_mail));
             message.setSubject("ALERT: Unusual Seismic Activity in " + region + " Detected!");
-            message.setContent("<center><h2>SEISMIC ALERTS</h2></center>"+"<p>Dear " + user_name + "</p>" +
+            message.setContent("<center><h2>SEISMIC ALERTS</h2></center>"+"<p>Dear " + user_name + "!</p>" +
                     "<p>We are reaching out to inform you about an unusual seismic activity detected in " + region +
                     " of magnitude " + magnitude + " on " + time +
                     ".<br>We want to ensure that you are aware of the situation and take necessary precautions to ensure your safety.</p>"
@@ -85,7 +86,7 @@ public class Alert {
                     "<ol>" +
                     "<li><a href='https://www.iccsafe.org/advocacy/safety-toolkits/earthquake-safety-and-resources/'>International Code Council - Safety & Resources</a></li>"
                     +
-                    "<li>Use our <a href='https://github.com/Snehil-Shah/Kafka-Seismic-Alerts'>Seismic Logger & Alerts Consumer Clients</a> to receive live updates and alerts!</li>"
+                    "<li>Use our <a href='https://github.com/Snehil-Shah/Seismic-Alerts-Streamer'>Seismic Logger & Alerts Consumer Clients</a> to receive live updates and alerts!</li>"
                     +
                     "<li>Use our endpoint <a href='http://localhost:5000/seismic_events'>localhost:5000/events</a> to POST Seismic Activity Updates in your Region to Help the Community or GET Seismic Activity Log Archives for Research Purposes!</li>"
                     +

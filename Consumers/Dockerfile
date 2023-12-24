@@ -1,6 +1,6 @@
 FROM maven:latest
 
-LABEL org.opencontainers.image.description="Build & Execute a Maven Project using exec-maven-plugin"
+LABEL org.opencontainers.image.description="Build a Maven Project using exec-maven-plugin"
 
 ADD . /consumers
 WORKDIR /consumers

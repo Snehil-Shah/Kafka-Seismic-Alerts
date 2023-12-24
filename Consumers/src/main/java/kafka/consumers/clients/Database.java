@@ -3,7 +3,6 @@ package kafka.consumers.clients;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URL;
 
 public class Database {
     public void kafka_connect() {
