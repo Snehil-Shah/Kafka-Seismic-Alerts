@@ -51,6 +51,7 @@ The overall <b>Goal</b> of the project is to build a portable, efficient and sca
 
 Apache Kafka because of its high through-put enables it to scale easily to huge traffic using many brokers & clusters. The Service is further fully Containerized making it ready for deployment.
 
+This Service can also be extended and Scaled by adding more Seismic Data Providers, and Consumer Clients like Web/Mobile Apps & other Safety Protocols.
 
 
 <h3 id="tech-used">• Technologies Used</h3>
@@ -144,7 +145,8 @@ To find the <container_id>, run ```docker ps``` or use Docker Desktop, and copy 
 
       The Rest API accessible at ```localhost:5000``` has the following endpoints:
   1. ```POST /seismic_events```: Self-Report Seismic Activity in you region
-   Request Body should adhere to the format for a successful submission:
+   
+   Request Body should adhere to the given format for a successful submission:
    ```json
    {
     "magnitude":"float",
