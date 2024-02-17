@@ -107,8 +107,9 @@ To setup the project locally follow the steps below
   - <h4>As a User</h4>
   
   1. **Fork** and **clone** the project to your local system
-  2. Set necessary environment variables. Create a ```.env``` file in the ```/Consumers``` directory and write your Gmail credentials in it for the Gmail SMTP client. This email will be used to send the Alerts to the users.
+  2. Set necessary environment variables. Create a ```.env``` file in the root directory and write your Gmail credentials in it for the Gmail SMTP client. This email will be used to send the Alerts to the users.
   Name them as:
+
   ```
   SERVICE_EMAIL_ID=john.doe@gmail.com
   SERVICE_EMAIL_PASSWORD=password

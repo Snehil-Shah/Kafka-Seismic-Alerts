@@ -1,0 +1,8 @@
+# Producers
+Producers/.venv
+Producers/Web/node_modules
+Producers/Web/dist
+
+# Consumers
+.env
+Consumers/target

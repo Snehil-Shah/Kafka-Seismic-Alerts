@@ -1,2 +1,3 @@
 .venv
 Web/node_modules
+Web/dist
