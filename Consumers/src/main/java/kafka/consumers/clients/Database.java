@@ -32,6 +32,7 @@ public class Database {
                     }
                     if ("Created".equals(connection.getResponseMessage())) {
                         System.out.println("-> Database initialized..");
+                        System.out.println("-> Alerts Enabled..");
                         connection.disconnect();
                         break;
                     }

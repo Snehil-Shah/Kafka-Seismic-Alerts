@@ -7,9 +7,10 @@ from __future__ import unicode_literals
 import json
 import psycopg2
 import re
-from flask import Flask, jsonify, request, make_response
+from flask import Flask, jsonify, request, make_response, send_from_directory
 from confluent_kafka import Producer
 import socket
+import os
 
 API_producer = Producer(
     {"bootstrap.servers": "kafka:9092",
@@ -17,25 +18,26 @@ API_producer = Producer(
     "log_level": 0}
 )
 
-API = Flask(__name__)
+API = Flask(__name__, static_folder='./Web/build')
 
 # GET
 
-def fetch_from_DB(table_1,table_2=None):
+def fetch_from_DB(table):
     try:
         conn = psycopg2.connect(
-            host="db",
-            database="Logs",
-            user="postgres",
-            password="password")
+            host = os.getenv("DB_HOST"),
+            database = os.getenv("DB_NAME"),
+            user = os.getenv("DB_USER"),
+            password = os.getenv("DB_PASSWORD"),
+        )
         cur = conn.cursor()
-        if table_2:
-            cur.execute(f"SELECT * FROM {table_1} UNION SELECT * FROM {table_2}")
-        else:
-            cur.execute(f"SELECT * FROM {table_1}")
-        return jsonify([{'magnitude':row[0], 'region': row[1], 'time': row[2], 'co_ordinates': row[3]} for row in cur.fetchall()])
+        cur.execute(f"SELECT * FROM {table}")
+        data = cur.fetchall()
+        if (not data):
+            raise Exception
+        return [{'magnitude':row[0], 'region': row[1], 'time': row[2], 'co_ordinates': row[3]} for row in data]
     except:
-        return make_response(jsonify({'message':"Service Unavailable at the Moment!"}),503)
+        return []
 
 # POST
 
@@ -81,10 +83,26 @@ def publish_event(event):
 
 # The Endpoints
 
+@API.route("/", methods=['GET'])
+def web():
+    if API.static_folder is not None:
+        return send_from_directory(API.static_folder, 'index.html')
+    else:
+        return make_response(jsonify({"message": "Web UI not available at the moment!"}), 503)
+@API.route('/assets/<path:filename>', methods=['GET'])
+def serve_static(filename):
+    if API.static_folder is not None:
+        return send_from_directory(API.static_folder + '/assets', filename)
+    else:
+        return make_response(jsonify({"message": "Web UI not available at the moment!"}), 503)
+
 @API.route("/seismic_events", methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'])
 def events():
     if request.method == "GET":
-        return fetch_from_DB("severe_seismic_events","minor_seismic_events")
+        data = fetch_from_DB("severe_seismic_events") + fetch_from_DB("minor_seismic_events")
+        if data:
+            return jsonify(data)
+        return make_response(jsonify({'message':"No Records Found!"}),503)
     elif request.method == "POST":
         return publish_event(parseData(request.get_json()))
     else:
@@ -93,20 +111,30 @@ def events():
 @API.route("/seismic_events/severe",methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'])
 def severe():
     if request.method == "GET":
-        return fetch_from_DB("severe_seismic_events")
+        data = fetch_from_DB("severe_seismic_events")
+        if data:
+            return jsonify(data)
+        return make_response(jsonify({'message':"No Records Found!"}),503)
     else:
         return make_response(jsonify({"message": "Invalid HTTP Access. Use GET method on this Endpoint"}),405)
 
 @API.route("/seismic_events/minor",methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'])
 def minor():
     if request.method == "GET":
-        return fetch_from_DB("minor_seismic_events")
+        data = fetch_from_DB("minor_seismic_events")
+        if data:
+            return jsonify(data)
+        return make_response(jsonify({'message':"No Records Found!"}),503)
     else:
         return make_response(jsonify({"message": "Invalid HTTP Access. Use GET method on this Endpoint"}),405)
 
 @API.errorhandler(404)
 def invalid_endpoint(e):
-    return make_response(jsonify({"message":"Not an Endpoint", "Available Endpoints":["GET, POST -> /seismic_events","GET -> /seismic_events/severe","GET -> /seismic_events/minor"]}),404)
+    return make_response(jsonify({"message":"Not an Endpoint", "Available Endpoints":["GET -> / (Web UI)","GET, POST -> /seismic_events","GET -> /seismic_events/severe","GET -> /seismic_events/minor"]}),404)
+
+@API.errorhandler(405)
+def method_not_allowed(e):
+    return make_response(jsonify({"message":"Method not Allowed", "Available Endpoints":["GET -> / (Web UI)","GET, POST -> /seismic_events","GET -> /seismic_events/severe","GET -> /seismic_events/minor"]}),405)
 
 if __name__ == "__main__":
     API.run(host='producers', port=5000)

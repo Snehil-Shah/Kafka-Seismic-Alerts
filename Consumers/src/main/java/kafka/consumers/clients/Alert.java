@@ -40,7 +40,10 @@ public class Alert {
                         return new PasswordAuthentication(service_email, password);
                     }
                 });
-        System.out.println("\nWelcome to Seismic Logger & Alerts Client!\n");
+        String RESET = "\033[0m";
+        String PURPLE = "\033[35m";
+        String BOLD = "\033[1m";
+        System.out.println(BOLD + "\nWelcome to Seismic Logger & Alerts Client!\n" + RESET);
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter your name: ");
         name = scanner.nextLine();
@@ -48,6 +51,7 @@ public class Alert {
         email = scanner.nextLine();
         System.out.print("Registered for Email Alerts!\n\n");
         scanner.close();
+        System.out.println(PURPLE+"Waiting for Kafka Broker & Database Sink Connector.."+RESET);
     }
 
     private void send_mail(String user_name, String recipient_mail,String time, String region, String co_ordinates,

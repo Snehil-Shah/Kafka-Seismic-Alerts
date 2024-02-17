@@ -56,12 +56,15 @@ services:
       dockerfile: Dockerfile
     ports:
       - "5000:5000"
-    volumes:
-      - "./Producers:/service"
     working_dir: "/service"
     depends_on:
       - kafka
       - db
+    environment:
+      DB_HOST: db
+      DB_NAME: Logs
+      DB_USER: postgres
+      DB_PASSWORD: password
   consumers:
     build:
       context: ./Consumers
@@ -73,5 +76,6 @@ services:
       KAFKA_SERVER: kafka:9092
     depends_on:
       - kafka
+      - kafka-db-connector
     stdin_open: true
     tty: true
