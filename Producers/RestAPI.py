@@ -1,9 +1,8 @@
 """
-This module builds a flask API endpoint where you can Report Seismic Activity,
-or fetch the entire preserved log history from the database
+This module builds a Flask API Server that serves the interactive Web UI and exposes API endpoints
+where you can Report Seismic Activity & fetch the entire preserved log history from the database.
 """
 
-from __future__ import unicode_literals
 import json
 import psycopg2
 import re
@@ -11,6 +10,8 @@ from flask import Flask, jsonify, request, make_response, send_from_directory
 from confluent_kafka import Producer
 import socket
 import os
+
+#* Config
 
 API_producer = Producer(
     {"bootstrap.servers": "kafka:9092",
@@ -20,9 +21,15 @@ API_producer = Producer(
 
 API = Flask(__name__, static_folder='./Web/build')
 
-# GET
+#* GET Controllers
 
 def fetch_from_DB(table):
+    """Fetch Logs from PostgresDB
+    Args:
+        table (str): Table name to query
+    Returns:
+        list: Returns a list of Seismic Records
+    """
     try:
         conn = psycopg2.connect(
             host = os.getenv("DB_HOST"),
@@ -39,9 +46,22 @@ def fetch_from_DB(table):
     except:
         return []
 
-# POST
+#* POST Controllers
 
 def parseData(data):
+    """Parse Seismic Event Data to adhere to the following format:
+    {
+        "magnitude":"float",
+        "region":"string",
+        "time":"ISO-8601 string. Min: YYYY, Max: YYYY-MM-DD(T)hh:mm:ss.ssssss(Zone)",
+        "co_ordinates":"array of floats"
+    }
+    and create a Kafka-JDBC Record Format with Schema.
+    Args:
+        data (dict): A Seismic Data dict to be parsed
+    Returns:
+        bool or dict: Returns False if data is invalid and returns a formatted Kafka Record dict if valid
+    """
     try:
         magnitude = float(data['magnitude'])
         region = data['region']
@@ -61,11 +81,13 @@ def parseData(data):
     except:
         return False
 
-def activity_logs():
-    return jsonify({"message": "GET request received, returning activity logs"})
-
-
 def publish_event(event):
+    """Publish a Seismic Record to the respective Kafka Topic based on its Magnitude
+    Args:
+        event (dict): Parsed Seismic Record
+    Returns:
+        Response: JSON HTTP Response
+    """
     if event:
         if event['payload']['magnitude']>=3.5:
             API_producer.produce('severe_seismic_events', value = json.dumps(event).encode('utf-8'))
@@ -74,43 +96,40 @@ def publish_event(event):
         return jsonify({"message": "Event Published Successfully","event":event['payload']})
     else:
         return make_response(jsonify({"message":"Incorrect Data Format! Try Again!",
-                                      "format":{
-                                          "magnitude":"float",
-                                          "region":"string",
-                                          "time":"ISO-8601 string. Min: YYYY, Max: YYYY-MM-DD(T)hh:mm:ss.ssssss(Zone)",
-                                          "co_ordinates":"array of floats"
-                                      }}),422)
+                                    "format": {
+                                        "magnitude":"float",
+                                        "region":"string",
+                                        "time":"ISO-8601 string. Min: YYYY, Max: YYYY-MM-DD(T)hh:mm:ss.ssssss(Zone)",
+                                        "co_ordinates":"array of floats"
+                                    }}),422)
 
-# The Endpoints
+#* The Endpoints
 
-@API.route("/", methods=['GET'])
-def web():
+# Web UI
+@API.route('/', defaults={'path': 'index.html'}, methods=['GET'])
+@API.route('/<path:path>', methods=['GET'])
+def serve(path):
     if API.static_folder is not None:
-        return send_from_directory(API.static_folder, 'index.html')
-    else:
-        return make_response(jsonify({"message": "Web UI not available at the moment!"}), 503)
-@API.route('/assets/<path:filename>', methods=['GET'])
-def serve_static(filename):
-    if API.static_folder is not None:
-        return send_from_directory(API.static_folder + '/assets', filename)
+        return send_from_directory(API.static_folder, path)
     else:
         return make_response(jsonify({"message": "Web UI not available at the moment!"}), 503)
 
+# Public APIs
 @API.route("/seismic_events", methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'])
 def events():
-    if request.method == "GET":
+    if request.method == "GET":  # Retrieve all Seismic Logs
         data = fetch_from_DB("severe_seismic_events") + fetch_from_DB("minor_seismic_events")
         if data:
             return jsonify(data)
         return make_response(jsonify({'message':"No Records Found!"}),503)
-    elif request.method == "POST":
+    elif request.method == "POST":  # Publish Seismic Event
         return publish_event(parseData(request.get_json()))
     else:
         return make_response(jsonify({"message": "Invalid HTTP Access. Use GET or POST method on this Endpoint"}),405)
 
 @API.route("/seismic_events/severe",methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'])
 def severe():
-    if request.method == "GET":
+    if request.method == "GET":  # Retrieve Severe Seismic Logs
         data = fetch_from_DB("severe_seismic_events")
         if data:
             return jsonify(data)
@@ -120,7 +139,7 @@ def severe():
 
 @API.route("/seismic_events/minor",methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'])
 def minor():
-    if request.method == "GET":
+    if request.method == "GET":  # Retrieve Minor Seismic Logs
         data = fetch_from_DB("minor_seismic_events")
         if data:
             return jsonify(data)
@@ -128,6 +147,7 @@ def minor():
     else:
         return make_response(jsonify({"message": "Invalid HTTP Access. Use GET method on this Endpoint"}),405)
 
+# Error Handlers
 @API.errorhandler(404)
 def invalid_endpoint(e):
     return make_response(jsonify({"message":"Not an Endpoint", "Available Endpoints":["GET -> / (Web UI)","GET, POST -> /seismic_events","GET -> /seismic_events/severe","GET -> /seismic_events/minor"]}),404)
@@ -136,5 +156,6 @@ def invalid_endpoint(e):
 def method_not_allowed(e):
     return make_response(jsonify({"message":"Method not Allowed", "Available Endpoints":["GET -> / (Web UI)","GET, POST -> /seismic_events","GET -> /seismic_events/severe","GET -> /seismic_events/minor"]}),405)
 
+#* Serve
 if __name__ == "__main__":
     API.run(host='producers', port=5000)
