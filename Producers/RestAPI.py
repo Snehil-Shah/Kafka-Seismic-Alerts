@@ -158,4 +158,4 @@ def method_not_allowed(e):
 
 #* Serve
 if __name__ == "__main__":
-    API.run(host='producers', port=5000)
+    API.run(host='0.0.0.0', port=5000)

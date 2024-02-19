@@ -6,6 +6,7 @@ function App() {
   const [seismicData, setSeismicData] = useState(null);
 
   useEffect(() => {
+    // Fetch all seismic events from our API
     fetch('http://localhost:5000/seismic_events')
       .then(response => {
         if (!response.ok) {
@@ -31,7 +32,7 @@ function App() {
             center={[coordinates[1], coordinates[0]]}
             radius={Math.max(quake.magnitude * 3, 5.5)}
             fillOpacity={0.5}
-            pathOptions={quake.magnitude >= 3.5 ? { color: 'red' } : {}}
+            pathOptions={quake.magnitude >= 3.5 ? { color: 'red' } : {}} // Red Marker for severe events
             eventHandlers={{
               mouseover: (e) => {
                 e.target.openPopup();

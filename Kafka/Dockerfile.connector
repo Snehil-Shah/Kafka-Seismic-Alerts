@@ -1,3 +1,4 @@
 FROM confluentinc/cp-kafka-connect:latest
 LABEL org.opencontainers.image.description="Confluent Kafka-Connect but with JDBC Sink Connector Installed"
+
 RUN confluent-hub install --no-prompt confluentinc/kafka-connect-jdbc:latest

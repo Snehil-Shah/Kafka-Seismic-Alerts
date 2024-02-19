@@ -44,6 +44,7 @@ public class Database {
                         request_stream.write(body, 0, body.length);
                     }
                     if ("Created".equals(connection.getResponseMessage())) {
+                        // Kafka-DB Connection Successful
                         System.out.println("-> Database initialized..");
                         connection.disconnect();
                         break;

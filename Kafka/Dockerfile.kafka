@@ -1,5 +1,4 @@
 FROM confluentinc/cp-kafka:7.4.3
-
 LABEL org.opencontainers.image.description="Create two topics and expose zookeeper connection ports to Docker network instead of local"
 
 COPY server.properties /etc/kafka/server.properties

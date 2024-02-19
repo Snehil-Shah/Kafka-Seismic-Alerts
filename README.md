@@ -2,7 +2,12 @@
   <h1 align="center">Seismic Alerts Streamer</h1>
 
   <p align="center">
-    A service that uses Kafka to listen & collect data of Realtime Global Seismic events from various Producers and stream them to various Consumer clients that can alert and keep the Users updated & safe in Realtime.
+    A service that utilizes Kafka to listen & collect data of Realtime Global Seismic events from various Producers and stream them to various Consumer clients that can alert and keep the users updated & safe in Realtime.
+
+  <img src="assets/web_ui.png" alt="Web UI"/>
+
+  <p align="center">Additionally all micro-services are Dockerized, ready to run & be deployed just about anywhere!</p>
+  
   </p>
 </p>
 
@@ -27,52 +32,46 @@
 
 **Seismic Alerts Streamer** at its core, uses Kafka to listen & collect data of Realtime Global Seismic events from Producers and streams them to Consumers.
 
-<img src="assets/architecture.png" alt="Architecture diagram for this microservice" />
+<img src="assets/architecture_2.png" alt="Architecture diagram for this microservice" />
 
 All Producers are managed via a Python interface.
 **Producers** consists of:
-1. A [WebSocket endpoint](https://www.seismicportal.eu/) by European-Mediterranean Seismological Centre (EMSC).
-2. A Flask Rest API that allows a user to **Report any Seismic Activity around them** or Fetch log archives from the Database.
+1. A [WebSocket endpoint](https://www.seismicportal.eu/realtime.html) by European-Mediterranean Seismological Centre (EMSC).
+2. A Flask Rest API that allows a user to **Report any Seismic Activity around them** (POST) or Fetch log archives from the Database (GET).
+
+<img src="assets/wrong_endpoint.png">
+<p align="center"><i>Intuitive Error Handling</i></p>
 
 These events are then published to two Kafka topics namely ```minor_seismic_events``` & ```severe_seismic_events``` based on their magnitude.
 
 **Consumers** connected to the Kafka broker, subscribe to these topics and start receiving Seismic Logs. All the consumers are managed via a Multi-threaded Java interface as clients.
 Consumers consists of:
-1. A Java SMTP client reads from ```severe_seismic_events``` and Alerts the user of potentially Dangerous Seismic Activity via Email
-2. A Live Log Feed that reads from both topics allowing the user to conveniently view a **Realtime feed of all Seismic Activity around the world**
+1. A Live Log Feed that reads from both topics allowing the user to conveniently view a **Realtime feed of all Seismic Activity around the world**
+  
+<img src="assets/consumers2_gray.png">
+
+2. A Java SMTP client reads from ```severe_seismic_events``` and Alerts the user of potentially Dangerous Seismic Activity via Email
+   
+<img src="assets/email.png">
+
 3. A Postgres Database connected directly via a Kafka-JDBC Sink Connector (initialized by the Java interface) conveniently maintains an archive of all Seismic Activity recorded through Kafka.
 
+<img src="assets/minor_db.png">
+<img src="assets/severe_db.png">
 
+4. An Interactive Web UI featuring a Map View of all Seismic Events reading from the Postgres Database via our Rest API.
+      
+<img src="assets/web_ui_2.png">
 
-<h3 id="future-prospects">• Future Prospects</h3>
-The overall <b>Goal</b> of the project is to build a portable, efficient and scalable system that can connect various Seismology Providers to various Consumer clients that can serve the users in innovative ways keeping them safe and alerted.
-
- <img src="assets/feature.jpg" />
-
-Apache Kafka because of its high through-put enables it to scale easily to huge traffic using many brokers & clusters. The Service is further fully Containerized making it ready for deployment.
-
-This Service can also be extended and Scaled by adding more Seismic Data Providers, and Consumer Clients like Web/Mobile Apps & other Safety Protocols.
-
-
-<h3 id="tech-used">• Technologies Used</h3>
-
-The Project is developed using the following Technologies, Libraries & Frameworks:
-
-- Kafka & Kafka-connect (Confluent)
-- Docker
-- Python
-- Java & Maven
-- Tornado
-- Flask
-- PostgreSQL
-- JavaMail API (SMTP)
-- Shell
-
-<h3 id="in-action">• In Action</h3>
+<!-- <h3 id="in-action">• In Action</h3>
 
 - #### Live Feed
 
   <img src="assets/consumers.png">
+
+- #### Web UI
+  
+  <img src="assets/web_ui.png">
 
 - #### Email Alerts
 
@@ -89,8 +88,32 @@ The Project is developed using the following Technologies, Libraries & Framework
 
 - #### Meaningful Developer Logs
 
-  <img src="assets/producers.png">
+  <img src="assets/producers.png"> -->
 
+<h3 id="future-prospects">• Future Prospects</h3>
+The overall <b>Goal</b> of the project is to build a portable, efficient and scalable system that can connect various Seismology Providers to various Consumer clients that can serve the users in innovative ways keeping them safe and alerted.
+
+ <img src="assets/feature.jpg" />
+
+Apache Kafka because of its high through-put enables it to scale easily to huge traffic using many brokers & clusters. The Service is further fully Containerized making it ready for deployment.
+
+This Service can also be extended and Scaled by adding more Seismic Data Providers, and Consumer Clients like Mobile Apps & other Safety Protocols and adding Data Analysis abilities to the Web UI.
+
+<h3 id="tech-used">• Technologies Used</h3>
+
+The Project is developed using the following Technologies, Libraries & Frameworks:
+
+- Kafka & Kafka-connect (Confluent)
+- Docker
+- Python
+- Java & Maven
+- React.js (Javascript)
+- Tornado
+- Flask
+- Leaflet.js
+- PostgreSQL
+- JavaMail API (SMTP)
+- Shell
 
 <!-- GETTING STARTED -->
 
@@ -114,6 +137,7 @@ To setup the project locally follow the steps below
   SERVICE_EMAIL_ID=john.doe@gmail.com
   SERVICE_EMAIL_PASSWORD=password
   ```
+
   If you have 2-step Authentication set up for your Google Account, [Create a new app password](https://support.google.com/accounts/answer/185833?visit_id=638381954978806969-3472662555&p=InvalidSecondFactor&rd=1) and use that password in your .env file
 
   <br>
@@ -169,6 +193,9 @@ To find the <container_id>, run ```docker ps``` or use Docker Desktop, and copy 
 
 - <h4>For Developers</h4>
   All micro-services are set up with meaningful logs that can help with debugging and further development.
+
+    <img src="assets/producers.png">
+
   To view log of other containers, run
 
   ```shell
@@ -176,6 +203,7 @@ To find the <container_id>, run ```docker ps``` or use Docker Desktop, and copy 
   ```
   If you wish to develop it locally without docker, manually install the [technologies used](#tech-used).
   Run the following commands to install necessary dependencies:
+
   ```bash
   cd Producers
   pip install -r requirements.txt
@@ -183,5 +211,9 @@ To find the <container_id>, run ```docker ps``` or use Docker Desktop, and copy 
   ```bash
   cd Consumers
   mvn clean install
+  ```
+  ```bash
+  cd Producers/Web
+  npm install
   ```
 
