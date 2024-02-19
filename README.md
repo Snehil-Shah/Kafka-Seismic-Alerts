@@ -2,11 +2,10 @@
   <h1 align="center">Seismic Alerts Streamer</h1>
 
   <p align="center">
-    A service that utilizes Kafka to listen & collect data of Realtime Global Seismic events from various Producers and stream them to various Consumer clients that can alert and keep the users updated & safe in Realtime.
+    A service that utilizes Apache Kafka to listen & collect data of Realtime Global Seismic events from various Producers and stream them to various Consumer clients that can alert and keep the users updated & safe in Realtime.
+    Additionally all micro-services are fully Dockerized, ready to run & be deployed just about anywhere!
 
-  <img src="assets/web_ui.png" alt="Web UI"/>
-
-  <p align="center">Additionally all micro-services are Dockerized, ready to run & be deployed just about anywhere!</p>
+  <img src="assets/web_ui_2.png" alt="Web UI"/>
   
   </p>
 </p>
@@ -19,7 +18,7 @@
     </li>
     <li><a href="#future-prospects">Future Prospects</a></li>
     <li><a href="#tech-used">Technologies Used</a></li>
-    <li><a href='#in-action'>In Action</a></li>
+    <!-- <li><a href='#in-action'>In Action</a></li> -->
     <li><a href="#getting-started">Getting Started</a>
       <ul>
         <li><a href="#pre-requisites">Pre-requisites</a></li>
@@ -30,9 +29,9 @@
 
 <h3 id="about-the-project">• About The Project</h3>
 
-**Seismic Alerts Streamer** at its core, uses Kafka to listen & collect data of Realtime Global Seismic events from Producers and streams them to Consumers.
+**Seismic Alerts Streamer** at its core, uses Apache Kafka to listen & collect data of Realtime Global Seismic events from Producers and streams them to Consumers.
 
-<img src="assets/architecture_2.png" alt="Architecture diagram for this microservice" />
+<p align="center"><img src="assets/architecture_2.png" alt="Architecture diagram for this microservice" /></p>
 
 All Producers are managed via a Python interface.
 **Producers** consists of:
@@ -59,9 +58,9 @@ Consumers consists of:
 <img src="assets/minor_db.png">
 <img src="assets/severe_db.png">
 
-4. An Interactive Web UI featuring a Map View of all Seismic Events reading from the Postgres Database via our Rest API.
+4. An Interactive Web UI (inspired by EMSC) featuring a Map View of all Seismic Events reading from the Postgres Database via our Rest API.
       
-<img src="assets/web_ui_2.png">
+<img src="assets/web_ui.png">
 
 <!-- <h3 id="in-action">• In Action</h3>
 
@@ -97,13 +96,13 @@ The overall <b>Goal</b> of the project is to build a portable, efficient and sca
 
 Apache Kafka because of its high through-put enables it to scale easily to huge traffic using many brokers & clusters. The Service is further fully Containerized making it ready for deployment.
 
-This Service can also be extended and Scaled by adding more Seismic Data Providers, and Consumer Clients like Mobile Apps & other Safety Protocols and adding Data Analysis abilities to the Web UI.
+This Service can also be extended and Scaled by adding more Seismic Data Providers, and Consumer Clients like Mobile Apps & other Safety Protocols and adding Data Analytics Tools to the Web UI.
 
 <h3 id="tech-used">• Technologies Used</h3>
 
 The Project is developed using the following Technologies, Libraries & Frameworks:
 
-- Kafka & Kafka-connect (Confluent)
+- Apache Kafka & Kafka-connect (Confluent)
 - Docker
 - Python
 - Java & Maven
@@ -112,7 +111,7 @@ The Project is developed using the following Technologies, Libraries & Framework
 - Flask
 - Leaflet.js
 - PostgreSQL
-- JavaMail API (SMTP)
+- JavaMail API & Google SMTP Server
 - Shell
 
 <!-- GETTING STARTED -->
@@ -130,7 +129,7 @@ To setup the project locally follow the steps below
   - <h4>As a User</h4>
   
   1. **Fork** and **clone** the project to your local system
-  2. Set necessary environment variables. Create a ```.env``` file in the root directory and write your Gmail credentials in it for the Gmail SMTP client. This email will be used to send the Alerts to the users.
+  2. Set necessary environment variables. Create a ```.env``` file in the root directory and write your Gmail credentials in it for the Gmail SMTP Server. This email will be used to send the Alerts to the users.
   Name them as:
 
   ```
