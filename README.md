@@ -5,7 +5,7 @@
     A service that utilizes Apache Kafka to listen & collect data of Realtime Global Seismic events from various Producers and stream them to various Consumer clients that can alert and keep the users updated & safe in Realtime.
     Additionally all micro-services are fully Dockerized, ready to run & be deployed just about anywhere!
 
-  <img src="assets/web_ui_2.png" alt="Web UI"/>
+  <img src=".assets/web_ui_2.png" alt="Web UI"/>
   
   </p>
 </p>
@@ -31,14 +31,14 @@
 
 **Seismic Alerts Streamer** at its core, uses Apache Kafka to listen & collect data of Realtime Global Seismic events from Producers and streams them to Consumers.
 
-<p align="center"><img src="assets/architecture_2.png" alt="Architecture diagram for this microservice" /></p>
+<p align="center"><img src=".assets/architecture_2.png" alt="Architecture diagram for this microservice" /></p>
 
 All Producers are managed via a Python interface.
 **Producers** consists of:
 1. A [WebSocket endpoint](https://www.seismicportal.eu/realtime.html) by European-Mediterranean Seismological Centre (EMSC).
 2. A Flask Rest API that allows a user to **Report any Seismic Activity around them** (POST) or Fetch log archives from the Database (GET).
 
-<img src="assets/wrong_endpoint.png">
+<img src=".assets/wrong_endpoint.png">
 <p align="center"><i>Intuitive Error Handling</i></p>
 
 These events are then published to two Kafka topics namely ```minor_seismic_events``` & ```severe_seismic_events``` based on their magnitude.
@@ -47,52 +47,52 @@ These events are then published to two Kafka topics namely ```minor_seismic_even
 Consumers consists of:
 1. A Live Log Feed that reads from both topics allowing the user to conveniently view a **Realtime feed of all Seismic Activity around the world**
   
-<img src="assets/consumers2_gray.png">
+<img src=".assets/consumers2_gray.png">
 
 2. A Java SMTP client reads from ```severe_seismic_events``` and Alerts the user of potentially Dangerous Seismic Activity via Email
    
-<img src="assets/email.png">
+<img src=".assets/email.png">
 
 3. A Postgres Database connected directly via a Kafka-JDBC Sink Connector (initialized by the Java interface) conveniently maintains an archive of all Seismic Activity recorded through Kafka.
 
-<img src="assets/minor_db.png">
-<img src="assets/severe_db.png">
+<img src=".assets/minor_db.png">
+<img src=".assets/severe_db.png">
 
 4. An Interactive Web UI (inspired by EMSC) featuring a Map View of all Seismic Events reading from the Postgres Database via our Rest API.
       
-<img src="assets/web_ui.png">
+<img src=".assets/web_ui.png">
 
 <!-- <h3 id="in-action">• In Action</h3>
 
 - #### Live Feed
 
-  <img src="assets/consumers.png">
+  <img src=".assets/consumers.png">
 
 - #### Web UI
   
-  <img src="assets/web_ui.png">
+  <img src=".assets/web_ui.png">
 
 - #### Email Alerts
 
-  <img src="assets/email.png">
+  <img src=".assets/email.png">
 
 - #### Database Entries
   - ```minor_seismic_events``` Table
 
-  <img src="assets/minor_db.png">
+  <img src=".assets/minor_db.png">
 
   - ```severe_seismic_events``` Table
 
-  <img src="assets/severe_db.png">
+  <img src=".assets/severe_db.png">
 
 - #### Meaningful Developer Logs
 
-  <img src="assets/producers.png"> -->
+  <img src=".assets/producers.png"> -->
 
 <h3 id="future-prospects">• Future Prospects</h3>
 The overall <b>Goal</b> of the project is to build a portable, efficient and scalable system that can connect various Seismology Providers to various Consumer clients that can serve the users in innovative ways keeping them safe and alerted.
 
- <img src="assets/feature.jpg" />
+ <img src=".assets/feature.jpg" />
 
 Apache Kafka because of its high through-put enables it to scale easily to huge traffic using many brokers & clusters. The Service is further fully Containerized making it ready for deployment.
 
@@ -151,7 +151,7 @@ To setup the project locally follow the steps below
 
   This should run the following containers
 
-<img src="assets/containers.png">
+<img src=".assets/containers.png">
 
 To find the <container_id>, run ```docker ps``` or use Docker Desktop, and copy the container id of container named ```consumers``` or ```seismic-alerts-streamer-consumers```
 
@@ -180,20 +180,20 @@ To find the <container_id>, run ```docker ps``` or use Docker Desktop, and copy 
    }                                 
    ```
 
-  <img src="assets/sending_post.png">
+  <img src=".assets/sending_post.png">
 
 
 
   2. ```GET /seismic_events```: Returns entire recorded archive from Database.
    
-  <img src="assets/sending_get.png">
+  <img src=".assets/sending_get.png">
 
   3. ```GET /seismic_events/minor``` or ```GET seismic_events/severe```: Returns records based on severity of the Seismic activities.
 
 - <h4>For Developers</h4>
   All micro-services are set up with meaningful logs that can help with debugging and further development.
 
-    <img src="assets/producers.png">
+    <img src=".assets/producers.png">
 
   To view log of other containers, run
 

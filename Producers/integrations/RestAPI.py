@@ -19,7 +19,7 @@ API_producer = Producer(
     "log_level": 0}
 )
 
-API = Flask(__name__, static_folder='./Web/build')
+API = Flask(__name__, static_folder='../web/build')
 
 #* GET Controllers
 

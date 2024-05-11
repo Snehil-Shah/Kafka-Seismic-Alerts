@@ -2,8 +2,6 @@
 # Kafka, Zookeeper, and Kafka JDBC Connector
 # Producers, Consumers and Postgres DB
 
-version: "3"
-
 services:
 
   zookeeper:
